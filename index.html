@@ -1,305 +1,302 @@
-<!DOCTYPE HTML>
-
+<!doctype html>
 <html lang="en">
-
 <head>
-	<!-- Google tag (gtag.js) -->
-	<!-- Google tag (gtag.js) -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-DM82JCVFJ7"></script>
-	<script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag() { dataLayer.push(arguments); }
-		gtag('js', new Date());
-
-		gtag('config', 'G-DM82JCVFJ7');
-	</script>
-
-
-
-	<!-- Favicon script -->
-	<link rel="apple-touch-icon" sizes="180x180" href="/images/favicon_io/apple-touch-icon.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon_io/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_io/favicon-16x16.png">
-	<link rel="manifest" href="/images/favicon_io/site.webmanifest">
-
-
-
-	<meta name="description" content="A brief description of your portfolio">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-	<!-- Open Graph meta tags -->
-	<meta property="og:type" content="website">
-	<meta property="og:title" content="Malek's Portfolio Website">
-	<meta property="og:description" content="A portfolio that showcases my experience in data engineering">
-	<meta property="og:image" content="https://malekaldoss.com/images/OpenGraph.png">
-	<meta property="og:url" content="https://malekaldoss.com">
-
-
-
-	<title>Malek's Portfolio</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes" />
-	<!-- Remove user scalable option or set to yes -->
-	<link rel="stylesheet" href="assets/css/main.css" />
-	<noscript>
-		<link rel="stylesheet" href="assets/css/noscript.css" />
-	</noscript>
-
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Malek Aldoss — Data Engineer</title>
+<meta name="description" content="Data engineer at Tempus AI. Redshift warehouses and Airflow and PySpark pipelines, plus Tend, a live iOS app whose AI recap is built so the model never computes a number.">
+<link rel="canonical" href="https://www.malekdoss.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Malek Aldoss">
+<meta property="og:title" content="Malek Aldoss — Data Engineer">
+<meta property="og:description" content="Pipelines and warehouses at work. Two iOS apps built solo, one of them live on the App Store.">
+<meta property="og:url" content="https://www.malekdoss.com/">
+<meta property="og:image" content="https://www.malekdoss.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400;600&family=Mona+Sans:wdth,wght@75..125,400..900&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
 </head>
+<body>
+<!--
+  surface: home
+  Pinned by the owner: clean, minimal, utilitarian, modular typography. Symbols and
+  pictograms removed on 2026-10-26 as too much; the dot in ALDOSS is the one left.
+  White ground, black ink, one ultramarine (#2433FF) for live status and the primary
+  action. Everything sits on square modules sharing 1px rules. Each piece of work is
+  one sentence and four numbers. Depth lives on /tend.html.
+-->
 
-<body class="is-preload">
 
-	<!-- Sidebar -->
-	<section id="sidebar">
-		<div class="inner">
-			<nav>
-				<ul>
-					<li><a href="#intro">Welcome</a></li>
-					<li><a href="#one">About Me</a></li>
-					<li><a href="#two">My Work</a></li>
-					<li><a href="#three">Contact</a></li>
-				</ul>
-			</nav>
-		</div>
-	</section>
+<a class="skip" href="#main">Skip to content</a>
 
-	<!-- Wrapper -->
-	<div id="wrapper">
+<header class="bar">
+  <div class="wrap bar__inner">
+    <a class="bar__id" href="/" aria-label="Malek Aldoss, home">
+      Malek Aldoss
+    </a>
+    <nav class="bar__nav" aria-label="Sections">
+      <a href="#work">Work</a>
+      <a class="nav-opt" href="#experience">Experience</a>
+      <a href="/tend.html">Tend</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
 
-		<!-- Intro -->
-		<section id="intro" class="wrapper style1 fullscreen fade-up">
-			<div class="inner">
-				<h1>Hi! I am <a href="https://www.linkedin.com/in/malek-aldoss/">Malek</a></h1>
-				<p>A Data engineer with a cloud-first mindset, delivering reliable and scalable data, one pipeline at a
-					time.
-				</p>
-				<ul class="actions">
-					<li><a href="images/Malek_Aldoss_Resume.pdf" target="_blank" rel="noopener noreferrer"
-							class="button scrolly">View Resume</a></li>
-				</ul>
-			</div>
-		</section>
+<main id="main">
 
-		<!-- One -->
-		<section id="one" class="wrapper style3 fade-up">
-			<div class="inner">
-				<h2>About ME</h2>
-				<p>I am a soon-to-be graduate of the University of Iowa with a major in Data Analytics & Information
-					Systems and a minor in Computer Science. With a solid grounding in the fundamental principles of
-					data engineering, I have acquired practical experience in designing and constructing robust data
-					systems, both through my coursework and personal projects. I thrive on taking on new challenges and
-					am constantly seeking opportunities to grow and enhance my skills and knowledge in this dynamic
-					field.
-				</p>
-				<div class="features">
+  <!-- ===== HERO ===== -->
+  <section class="wrap hero">
+    <div class="hero__grid">
+      <div class="hero__id">
+      <h1>
+        <span class="vh">Malek Aldoss</span>
+        <span class="tiles writes" aria-hidden="true">
+          <span class="tile" style="--i:0"><span>M</span></span>
+          <span class="tile" style="--i:1"><span>A</span></span>
+          <span class="tile" style="--i:2"><span>L</span></span>
+          <span class="tile" style="--i:3"><span>E</span></span>
+          <span class="tile" style="--i:4"><span>K</span></span>
+          <span class="tile" style="--i:5"></span>
+          <span class="tile" style="--i:6"><span>A</span></span>
+          <span class="tile" style="--i:7"><span>L</span></span>
+          <span class="tile" style="--i:8"><span>D</span></span>
+          <span class="tile" style="--i:9"><span class="tile__dot"></span></span>
+          <span class="tile" style="--i:10"><span>S</span></span>
+          <span class="tile" style="--i:11"><span>S</span></span>
+        </span>
+      </h1>
+      <p class="hero__role">Data Engineer<span>at Tempus AI</span></p>
+      </div>
 
-					<section>
-						<span class="icon solid major fa-code"></span>
-						<h3>Technical Skills</h3>
-						<p>&emsp;<b>Languages:</b> Python | R | SQL | Java<br>
-							&emsp;<b>Cloud Platforms:</b> Microsoft Azure | Databricks | Snowflake<br>
-							&emsp;<b>Tools & Frameworks:</b> Flask | PySpark | Hadoop | Pandas<br>
-							&emsp;<b>Concepts:</b> RESTful APIs | ETL/ELT Pipelines | Data Modeling</p>
-					</section>
-					<section>
-						<span class="icon solid major fa-certificate"></span>
-						<h3>Certifications</h3>
-						<p>
-							&emsp;<a
-								href="https://www.credly.com/badges/e29d3d34-d373-4fbb-a223-0635bb6c0298/public_url">Microsoft
-								Azure Fundamentals</a> - AZ-900 | December 19th, 2022<br>
-							&emsp;<a
-								href="https://www.credly.com/badges/2f22f246-e0d2-4fe3-9b20-41b4ae736683/public_url">Snowflake
-								Hands On Essentials</a> - Data Warehouse | February 2023<br>
-							&emsp;Microsoft Azure Data Fundamentals - DP-900 | Expected May 2023<br>
-							<!-- &emsp;AWS Certified Cloud Practitioner | Expected May 2023<br> -->
-							<!-- <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="2f22f246-e0d2-4fe3-9b20-41b4ae736683" data-share-badge-host="https://www.credly.com"></div><script type="text/javascript" async src="//cdn.credly.com/assets/utilities/embed.js"></script> -->
-							<!-- <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="e29d3d34-d373-4fbb-a223-0635bb6c0298" data-share-badge-host="https://www.credly.com"></div><script type="text/javascript" async src="//cdn.credly.com/assets/utilities/embed.js"></script> -->
-						</p>
-					</section>
-					<section>
-						<span class="icon solid major fa-laptop"></span>
-						<h3>Work Experience</h3>
-						<p>&emsp;Digital Assurance and Transparency Intern - <a
-								href="https://www.pwc.com/us/en/services/trust-solutions/digital-assurance-transparency.html">PricewaterCooper</a>
-						</p>
-					</section>
-					<section>
-						<span class="icon solid major fa-school"></span>
-						<h3>Education</h3>
-						<p>&emsp;<b>University of Iowa</b> - Tippie College of Business | B.B.A.<br>
-							&emsp;&emsp; Data Analytics & Information Systems Major<br>
-							&emsp;&emsp; Computer Science Minor<br>
-							<br>
-							&emsp;<b>Kirkwood Community College</b> | Associate Degree<br>
-							&emsp;&emsp; Liberal Arts & Science
-						</p>
-					</section>
-					<!-- <section>
-									<span class="icon solid major fa-link"></span>
-									<h3>Data Serving</h3>
-									<p>Phasellus convallis elit id ullam corper amet et pulvinar. Duis aliquam turpis mauris, sed ultricies erat dapibus.</p>
-								</section> -->
-					<!-- <section>
-									<span class="icon major fa-gem"></span>
-									<h3>Undercurrents</h3>
-									<p>Phasellus convallis elit id ullam corper amet et pulvinar. Duis aliquam turpis mauris, sed ultricies erat dapibus.</p>
-								</section> -->
-				</div>
-				<!-- <ul class="actions">
-					<li><a href="generic.html" class="button">Learn more</a></li>
-				</ul> -->
-			</div>
-		</section>
+      <div class="hero__side">
+        <p class="hero__lede">I build the pipelines and warehouses that turn raw tables into
+        answers people can use without asking an engineer. On my own time, I build iOS apps
+        end to end.</p>
+        <ul class="links mod hero__links">
+          <li><a class="is-primary" href="mailto:Malek.Taldoss@gmail.com">
+            <span class="label">Email</span>
+            <span class="links__v">Malek.Taldoss@gmail.com</span>
+          </a></li>
+          <li><a href="https://www.linkedin.com/in/malek-aldoss/" rel="me noopener">
+            <span class="label">LinkedIn</span>
+            <span class="links__v">malek-aldoss</span>
+          </a></li>
+          <li><a href="https://github.com/malek-doss" rel="me noopener">
+            <span class="label">GitHub</span>
+            <span class="links__v">malek-doss</span>
+          </a></li>
+        </ul>
+      </div>
+    </div>
 
-		<!-- Two -->
-		<section id="two" class="wrapper style2 spotlights">
-			<section>
-				<a href="Projects/FlaskProjectPage.html" class="image"><img src="images/Flask_Thumbnail.jpeg"
-						alt="A thumbnail that shows what tools and technologies were used on this project"
-						data-position="center center" /></a>
-				<div class="content">
-					<div class="inner">
-						<h2>RESTful API using Flask</h2>
-						<p>A RESTfulk api that mimics an ecomemerce store's api. The api was built using Python and the
-							Flask library. Tested using Insomia and deployed on Render.com</p>
-						<ul class="actions">
-							<li><a href="Projects/FlaskProjectPage.html" class="button">Explore project</a></li>
-						</ul>
-					</div>
-				</div>
-			</section>
-			<section>
-				<a href="Projects/Databricks.html" class="image"><img src="images/Databricks_Thumbnail.jpeg"
-						alt="A thumbnail that shows what tools and technologies were used on this project"
-						data-position="center center" /></a>
-				<div class="content">
-					<div class="inner">
-						<h2>Databricks Notebooks</h2>
-						<p>A cllection of SQL, Python, and R notebooks that show cases my experience with Databricks and
-							data transformations in different languages.</p>
-						<ul class="actions">
-							<li><a href="Projects/Databricks.html" class="button">Explore Notebooks</a></li>
-						</ul>
-					</div>
-				</div>
-			</section>
-			<section>
-				<a href="Projects/Azure.html" class="image"><img src="images/Azrue_Thumbnail.jpeg"
-						alt="A thumbnail that shows what tools and technologies were used on this project"
-						data-position="center center" /></a>
-				<div class="content">
-					<div class="inner">
-						<h2>Pipelines in Azure</h2>
-						<p>A collection of data projects using Microsoft's Azure data solutions. Show cases my
-							experience with Azure Data Factory and Azure Functions.</p>
-						<ul class="actions">
-							<li><a href="Projects/Azure.html" class="button">Explore Project</a></li>
-						</ul>
-					</div>
-				</div>
-			</section>
-		</section>
+  </section>
 
-		<!-- Three -->
-		<section id="three" class="wrapper style1 fade-up">
-			<div class="inner">
-				<h2>Get in touch</h2>
-				<p></p>
-				<div class="split style1">
-					<section>
-						<form method="post" action="#">
-							<div class="fields">
-								<div class="field half">
-									<label for="name">Name</label>
-									<input type="text" name="name" id="name" />
-								</div>
-								<div class="field half">
-									<label for="email">Email</label>
-									<input type="text" name="email" id="email" />
-								</div>
-								<div class="field">
-									<label for="message">Message</label>
-									<textarea name="message" id="message" rows="5"></textarea>
-								</div>
-							</div>
-							<ul class="actions">
-								<li><a href="" class="button submit">Send Message</a></li>
-							</ul>
-						</form>
-					</section>
-					<section>
-						<ul class="contact">
-							<li>
-								<h3>Address</h3>
-								<span><a href="https://goo.gl/maps/cnxaAcYp6oxEt2Kw7North">North Liberty</a>, IA
-									52317<br>
-									USA</span>
-							</li>
-							<li>
-								<h3>Email</h3>
-								<a href="www.gmail.com">Malek.TAldoss@gmail.com</a>
-							</li>
-							<li>
-								<h3>Phone</h3>
-								<span>(319) 359-8818</span>
-							</li>
-							<li>
-								<h3>Social</h3>
-								<ul class="icons">
-									<li><a href="https://www.linkedin.com/in/malek-aldoss/"
-											class="icon brands fa-linkedin-in"><span class="label">LinkedIn</span></a>
-									</li>
-									<li><a href="https://github.com/m-Doss" class="icon brands fa-github"><span
-												class="label">GitHub</span></a></li>
-									<!-- <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
-												<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
-												<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li> -->
+  <!-- ===== WORK ===== -->
+  <section class="wrap sec" id="work" aria-labelledby="work-h">
+    <div class="sec__head">
+      <span class="sec__n">01</span>
+      <h2 class="sec__title" id="work-h">Work</h2>
+      <span class="sec__meta label">Two apps, built solo · 2026</span>
+    </div>
 
-								</ul>
-							</li>
-						</ul>
-					</section>
-				</div>
-			</div>
-		</section>
+    <div class="projs">
 
-	</div>
+      <article class="proj" aria-labelledby="tend-h">
+        <header class="proj__head">
+          <img class="proj__icon" src="/assets/tend/tend-icon.png" alt="" width="44" height="44">
+          <h3 class="proj__name" id="tend-h">Tend</h3>
+          <div class="proj__meta">
+            <span class="status status--live">Live on the App Store</span>
+            <span class="label muted">iOS · 2026</span>
+          </div>
+        </header>
 
-	<!-- Footer -->
-	<footer id="footer" class="wrapper style1-alt">
-		<div class="inner">
-			<ul class="menu">
-				<li>Content &copy; Malek Aldoss 2023.</li>
-				<li><a href="/LegalandComplaince/terms-conditions.html">Terms and Conditions</a></li>
-				<li><a href="/LegalandComplaince/privacy-policy.html">Privacy Policy</a></li>
-				<li><a href="/LegalandComplaince/cookies-policy.html">Cookies</a></li>
-			</ul>
-		</div>
-	</footer>
+        <div class="proj__body">
+          <div>
+            <p class="proj__lede">A daily ritual for couples. The AI recap is built so the
+            model can't state a number it didn't read: a deterministic engine computes every
+            figure, and the model's only job is to put them into words.</p>
+            <div class="actions">
+              <a class="btn btn--primary" href="/tend.html">Read the case study</a>
+              <a class="btn" href="https://apps.apple.com/us/app/tend-a-daily-couples-ritual/id6794927461" rel="noopener">View on the App Store</a>
+            </div>
+          </div>
+          <dl class="facts mod">
+            <div><dt>commits since July</dt><dd>433</dd></div>
+            <div><dt>backend tests</dt><dd>104</dd></div>
+          </dl>
+        </div>
+      </article>
 
-	<!-- <div id="cookie-popup">
-		<p>
-			By using this site you agree to the storing of cookies on your device to
-			enhance site navigation and to analyze site usage. Learn more about our
-			<a href="/LegalandComplaince/cookies-policy.html">cookie policy</a>.
-		</p>
-		<p>
-			<button id="accept-cookies">Accept</button>
-		</p>
-	</div>
+      <article class="proj" aria-labelledby="fivedue-h">
+        <header class="proj__head">
+          <h3 class="proj__name" id="fivedue-h">FiveDue</h3>
+          <div class="proj__meta">
+            <span class="status">In TestFlight beta</span>
+            <span class="label muted">iOS · 2026</span>
+          </div>
+        </header>
 
-	<script src="assets/js/cookie-popup.js"></script> -->
+        <div class="proj__body">
+          <div>
+            <p class="proj__lede">A salah tracker built around a passive NFC puck kept where
+            you pray. At each call to prayer, distracting apps lock until you tap it, and they
+            come back a few minutes later, so tapping and walking away earns nothing. Swift 6 on
+            Apple's Screen Time APIs, with puck links signed with Ed25519 and checked offline.</p>
+          </div>
+          <dl class="facts mod">
+            <div><dt>commits since September</dt><dd>962</dd></div>
+            <div><dt>unit tests passing</dt><dd>1,936</dd></div>
+          </dl>
+        </div>
+      </article>
 
-	<!-- Scripts -->
-	<script src="assets/js/jquery.min.js"></script>
-	<script src="assets/js/jquery.scrollex.min.js"></script>
-	<script src="assets/js/jquery.scrolly.min.js"></script>
-	<script src="assets/js/browser.min.js"></script>
-	<script src="assets/js/breakpoints.min.js"></script>
-	<script src="assets/js/util.js"></script>
-	<script src="assets/js/main.js"></script>
+    </div>
+  </section>
 
+  <!-- ===== EXPERIENCE ===== -->
+  <section class="wrap sec" id="experience" aria-labelledby="exp-h">
+    <div class="sec__head">
+      <span class="sec__n">02</span>
+      <h2 class="sec__title" id="exp-h">Experience</h2>
+      <span class="sec__meta label">2022 → now</span>
+    </div>
+
+    <table class="ledger">
+      <caption class="vh">Professional experience, most recent first</caption>
+      <colgroup><col class="c-when"><col class="c-where"><col class="c-role"><col></colgroup>
+      <thead>
+        <tr><th scope="col" class="label">When</th><th scope="col" class="label">Where</th><th scope="col" class="label">Role</th><th scope="col" class="label">What</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="when">Now</td>
+          <th scope="row">Tempus AI</th>
+          <td class="role">Data Engineer</td>
+          <td class="what"></td>
+        </tr>
+        <tr>
+          <td class="when">From 2024</td>
+          <th scope="row">Wellmark Blue Cross Blue Shield</th>
+          <td class="role">Data Wrangler</td>
+          <td class="what">A self-serve Redshift warehouse in bronze, silver and gold layers, fed by
+          Python and Airflow. A PySpark pipeline on AWS Glue moving about 3&nbsp;TB of payer
+          pricing data a month. Thirty-plus claims reports automated, about 20 hours a month
+          back.</td>
+        </tr>
+        <tr>
+          <td class="when">2023</td>
+          <th scope="row">Covetrus</th>
+          <td class="role">Data Engineering Intern</td>
+          <td class="what">Real-time monitoring for a pipeline spanning 3 source systems, 24
+          target tables and 30+ Kafka topics. Data vault modelling in Snowflake.</td>
+        </tr>
+        <tr>
+          <td class="when">2022</td>
+          <th scope="row">PwC</th>
+          <td class="role">Digital Assurance &amp; Transparency Intern</td>
+          <td class="what">Audited 50+ client reports by reading the SQL behind them. IT general
+          controls across SQL, Oracle and SAP.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===== TOOLKIT + EDUCATION ===== -->
+  <section class="wrap sec" id="toolkit" aria-labelledby="kit-h">
+    <div class="sec__head">
+      <span class="sec__n">03</span>
+      <h2 class="sec__title" id="kit-h">Toolkit</h2>
+      <span class="sec__meta label"></span>
+    </div>
+
+    <div class="kit mod">
+      <div><h3 class="label">Languages</h3><p>Python · SQL · PySpark · DAX · TypeScript · Swift</p></div>
+      <div><h3 class="label">Cloud &amp; warehouse</h3><p>AWS Redshift, Glue, Lambda, S3 · Azure · Snowflake</p></div>
+      <div><h3 class="label">Orchestration &amp; streaming</h3><p>Airflow · Glue jobs · Kafka</p></div>
+      <div><h3 class="label">Modelling &amp; BI</h3><p>Bronze / silver / gold · data vault · Power BI · REST APIs</p></div>
+      <div class="is-key"><h3 class="label">AI systems</h3><p>Genkit · Gemini structured output · deterministic fact engines · cost gates in front of every model call</p></div>
+      <div><h3 class="label">Apps</h3><p>SwiftUI · Screen Time APIs · CloudKit · Expo · React Native · Firebase · RevenueCat · Sentry</p></div>
+    </div>
+  </section>
+
+  <section class="wrap sec" id="education" aria-labelledby="edu-h">
+    <div class="sec__head">
+      <span class="sec__n">04</span>
+      <h2 class="sec__title" id="edu-h">Education</h2>
+      <span class="sec__meta label"></span>
+    </div>
+
+    <table class="ledger">
+      <caption class="vh">Education and certifications</caption>
+      <colgroup><col class="c-when"><col class="c-where"><col class="c-role"><col></colgroup>
+      <tbody>
+        <tr>
+          <td class="when">2023</td>
+          <th scope="row">University of Iowa</th>
+          <td class="role">BS, Business Analytics &amp; Information Systems · minor in Computer Science</td>
+          <td class="what muted">Dean's List twice · President's List</td>
+        </tr>
+        <tr>
+          <td class="when">2024</td>
+          <th scope="row">AWS</th>
+          <td class="role">Certified Cloud Practitioner</td>
+          <td class="what"></td>
+        </tr>
+        <tr>
+          <td class="when">2023</td>
+          <th scope="row">Microsoft</th>
+          <td class="role">Azure Data Fundamentals (DP&#8209;900)</td>
+          <td class="what"></td>
+        </tr>
+        <tr>
+          <td class="when">2022</td>
+          <th scope="row">Microsoft</th>
+          <td class="role">Azure Fundamentals (AZ&#8209;900)</td>
+          <td class="what"></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===== CONTACT ===== -->
+  <section class="wrap sec" id="contact" aria-labelledby="contact-h">
+    <div class="sec__head">
+      <span class="sec__n">05</span>
+      <h2 class="sec__title" id="contact-h">Contact</h2>
+      <span class="sec__meta label">Des Moines, IA</span>
+    </div>
+
+    <a class="contact__big" href="mailto:Malek.Taldoss@gmail.com">
+      <span>
+        <span class="label" style="display:block;margin-bottom:var(--s3)">Email is fastest</span>
+        <span class="contact__addr">Malek.Taldoss@gmail.com</span>
+      </span>
+    </a>
+    <div class="contact__row mod">
+      <a href="https://www.linkedin.com/in/malek-aldoss/" rel="me noopener"><span>LinkedIn</span><span>malek-aldoss</span></a>
+      <a href="https://github.com/malek-doss" rel="me noopener"><span>GitHub</span><span>malek-doss</span></a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap foot">
+  <div class="foot__row">
+    <span>© <span id="yr">2026</span> Malek Aldoss</span>
+    <a class="foot__push" href="/legal/privacy.html">Privacy</a>
+    <a href="/legal/terms.html">Terms</a>
+  </div>
+</footer>
+
+<script src="/assets/site.js" defer></script>
 </body>
-
 </html>

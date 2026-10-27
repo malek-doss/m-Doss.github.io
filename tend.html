@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tend — Malek Aldoss</title>
+<meta name="description" content="How Tend's AI recap is built so the model can never compute: a deterministic engine produces every number, the model only phrases them. Architecture, cost gates, authorisation rules, and the truncation incident.">
+<link rel="canonical" href="https://www.malekdoss.com/tend.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Malek Aldoss">
+<meta property="og:title" content="Tend — a recap system built so the model cannot compute">
+<meta property="og:description" content="A deterministic engine produces every number. The model's only permitted job is to phrase what that engine already says.">
+<meta property="og:url" content="https://www.malekdoss.com/tend.html">
+<meta property="og:image" content="https://www.malekdoss.com/assets/og-tend.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400;600&family=Mona+Sans:wdth,wght@75..125,400..900&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<!--
+  surface: Tend case study (Read)
+  Same world as the home page. Facts re-measured against
+  malek-doss/tend-app main @ 00692f0 (2026-09-25) on 2026-10-26.
+-->
+
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="bar">
+  <div class="wrap bar__inner">
+    <a class="bar__id" href="/" aria-label="Malek Aldoss, home">
+      Malek Aldoss
+    </a>
+    <nav class="bar__nav" aria-label="Site">
+      <a href="/#work">Work</a>
+      <a class="nav-opt" href="/#experience">Experience</a>
+      <a href="/tend.html" aria-current="page">Tend</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ===== HEADER ===== -->
+  <section class="wrap doc-head">
+    <div class="doc-head__grid">
+      <div class="doc-head__id">
+      <h1>
+        <span class="vh">Tend</span>
+        <span class="tiles writes" aria-hidden="true">
+          <span class="tile" style="--i:0"><span>T</span></span>
+          <span class="tile" style="--i:1"><span>E</span></span>
+          <span class="tile" style="--i:2"><span>N</span></span>
+          <span class="tile" style="--i:3"><span>D</span></span>
+          <span class="tile tile--img" style="--i:4"><img src="/assets/tend/tend-icon.png" alt="" width="120" height="120"></span>
+          <span class="tile" style="--i:5"></span>
+        </span>
+      </h1>
+      <div class="doc-head__kicker">
+        <span class="label muted">Case study · personal product · 2026</span>
+        <span class="status status--live">Live on the App Store · v1.2.0</span>
+      </div>
+      </div>
+      <div class="doc-head__side">
+        <div class="doc-head__lede">
+          <p>Two partners each privately pick <strong>one word a day</strong> for the weather
+          between them, from a fixed vocabulary of eight. Neither sees the other's until both
+          have logged. A year of that is a calendar of colour.</p>
+          <p>I designed and built it alone, and it has been on the App Store since 13 September
+          2026: an Expo client, a Firebase backend, seven Cloud Functions, and a recap system
+          whose entire architecture exists to make one thing impossible.</p>
+        </div>
+        <div class="actions">
+          <a class="btn btn--primary" href="https://apps.apple.com/us/app/tend-a-daily-couples-ritual/id6794927461" rel="noopener">View on the App Store</a>
+          <a class="btn" href="/#contact">Ask me about it</a>
+        </div>
+      </div>
+    </div>
+
+    <nav class="toc mod" aria-label="Contents">
+      <a href="#spectrum"><span>01</span>The eight words</a>
+      <a href="#architecture"><span>02</span>Architecture</a>
+      <a class="is-key" href="#split"><span>03</span>Compute, then narrate</a>
+      <a href="#incident"><span>04</span>The truncation incident</a>
+      <a href="#digest"><span>05</span>The digest is ETL</a>
+      <a href="#cost"><span>06</span>Cost engineering</a>
+      <a href="#authz"><span>07</span>Authorisation as schema</a>
+      <a href="#money"><span>08</span>Correctness under money</a>
+      <a href="#gates"><span>09</span>Gates that actually run</a>
+      <a href="#scope"><span>10</span>Scope &amp; method</a>
+    </nav>
+  </section>
+
+  <!-- ===== 01 SPECTRUM ===== -->
+  <section class="wrap dsec" id="spectrum" aria-labelledby="s01">
+    <div class="dsec__head">
+      <span class="dsec__n">01</span>
+      <h2 class="dsec__title" id="s01">The eight words</h2>
+      <span class="dsec__src">src/constants/words.ts</span>
+    </div>
+
+    <div class="cols">
+      <div class="prose">
+        <p>The product replaces the free-text box that every journalling app defaults to with a
+        <strong>fixed vocabulary of eight words</strong>. That constraint is the whole product:
+        it is what makes a year of a relationship renderable as a single field of colour, and
+        it is what a neighbouring app cannot copy without adopting the same limitation.</p>
+        <p>The words are <strong>weather</strong>. The first vocabulary was a set of
+        first-person verdicts (close, warm, secure, steady, off, distant, tense), and its bad
+        end pointed at a person. Your partner reads your word, so <em>distant</em> landed as an
+        accusation, and people under-logged exactly the days the app exists to catch. Weather
+        moves the claim into the space between two people, which neither of them owns:
+        <em>distant</em> is something a person is; <code>fog</code> is something that happens
+        to a place.</p>
+        <p>The colours are data design, not a palette. Seven rungs run as one monotone ramp,
+        bright to dark <em>and</em> warm to cool, with adjacent bands an even ~1.16 apart in
+        luminance, so greyscale order equals ladder order and the scale reads with no colour
+        vision at all. <code>clearing</code> sits off-spectrum on purpose: it is a direction
+        rather than a rung. Every fill and ink is identical in the light and dark themes, and
+        an executable check asserts that every band stays clear of the empty tile.</p>
+      </div>
+
+      <div>
+        <div class="spectrum">
+          <div class="spectrum__row"><span class="spectrum__i">1</span><span class="spectrum__band" style="background:#E9CF7E;color:#5A3C12">golden</span><span class="spectrum__terr">rare and bright</span><span class="spectrum__hex">#E9CF7E</span></div>
+          <div class="spectrum__row"><span class="spectrum__i">2</span><span class="spectrum__band" style="background:#F0B87A;color:#593315">sunny</span><span class="spectrum__terr">bright</span><span class="spectrum__hex">#F0B87A</span></div>
+          <div class="spectrum__row"><span class="spectrum__i">3</span><span class="spectrum__band" style="background:#EEA383;color:#572B1B">mild</span><span class="spectrum__terr">settled</span><span class="spectrum__hex">#EEA383</span></div>
+          <div class="spectrum__row"><span class="spectrum__i">4</span><span class="spectrum__band" style="background:#99AAB8;color:#1A3144">cloudy</span><span class="spectrum__terr">neutral</span><span class="spectrum__hex">#99AAB8</span></div>
+          <div class="spectrum__row"><span class="spectrum__i">5</span><span class="spectrum__band" style="background:#789DD7;color:#1B293F">mist</span><span class="spectrum__terr">veiled</span><span class="spectrum__hex">#789DD7</span></div>
+          <div class="spectrum__row"><span class="spectrum__i">6</span><span class="spectrum__band" style="background:#7B8DD2;color:#182238">fog</span><span class="spectrum__terr">distance</span><span class="spectrum__hex">#7B8DD2</span></div>
+          <div class="spectrum__row"><span class="spectrum__i">7</span><span class="spectrum__band" style="background:#9975C4;color:#1A1226">storm</span><span class="spectrum__terr">friction</span><span class="spectrum__hex">#9975C4</span></div>
+          <div class="spectrum__row spectrum__row--off"><span class="spectrum__i">—</span><span class="spectrum__band" style="background:#6FAE9A;color:#063127">clearing</span><span class="spectrum__terr">recovery, off&#8209;spectrum</span><span class="spectrum__hex">#6FAE9A</span></div>
+        </div>
+        <p class="note mt-3">Seven rungs bright to dark, plus one off-spectrum direction. Every
+        word's name is real text on its own fill and clears 4.5:1 there, so the colour is never
+        the only way to read it.</p>
+      </div>
+    </div>
+
+    <div class="fig mt-6">
+      <div class="cols cols--even fig__pad">
+        <div>
+          <h3 class="label" style="margin-bottom:var(--s4)">One month, in the eight fills</h3>
+          <div class="cal" role="img" aria-label="A five-week calendar grid. The first two weeks run golden, sunny and mild. The third week drifts through cloudy, mist and fog into storm. A clearing day in the fourth week turns it, and the last week returns to sunny and golden.">
+          <i></i>
+          <i></i>
+          <i></i>
+          <i style="background:#EEA383"></i>
+          <i style="background:#F0B87A"></i>
+          <i style="background:#E9CF7E"></i>
+          <i style="background:#F0B87A"></i>
+          <i style="background:#99AAB8"></i>
+          <i style="background:#EEA383"></i>
+          <i style="background:#F0B87A"></i>
+          <i style="background:#F0B87A"></i>
+          <i style="background:#E9CF7E"></i>
+          <i style="background:#E9CF7E"></i>
+          <i style="background:#F0B87A"></i>
+          <i style="background:#EEA383"></i>
+          <i style="background:#99AAB8"></i>
+          <i style="background:#789DD7"></i>
+          <i style="background:#789DD7"></i>
+          <i style="background:#7B8DD2"></i>
+          <i style="background:#7B8DD2"></i>
+          <i style="background:#9975C4"></i>
+          <i style="background:#9975C4"></i>
+          <i style="background:#7B8DD2"></i>
+          <i style="background:#789DD7"></i>
+          <i style="background:#6FAE9A"></i>
+          <i style="background:#F0B87A"></i>
+          <i style="background:#E9CF7E"></i>
+          <i style="background:#E9CF7E"></i>
+          <i style="background:#F0B87A"></i>
+          <i style="background:#EEA383"></i>
+          <i style="background:#99AAB8"></i>
+          <i style="background:#F0B87A"></i>
+          <i style="background:#E9CF7E"></i>
+          <i style="background:#F0B87A"></i>
+          <i></i>
+          </div>
+          <div class="calkey">
+          <span><b style="background:#E9CF7E"></b>golden</span>
+          <span><b style="background:#F0B87A"></b>sunny</span>
+          <span><b style="background:#EEA383"></b>mild</span>
+          <span><b style="background:#99AAB8"></b>cloudy</span>
+          <span><b style="background:#789DD7"></b>mist</span>
+          <span><b style="background:#7B8DD2"></b>fog</span>
+          <span><b style="background:#9975C4"></b>storm</span>
+          <span><b style="background:#6FAE9A"></b>clearing</span>
+          </div>
+        </div>
+        <div class="prose">
+          <p>This is the artifact the whole product exists to produce, and it is the reason the
+          vocabulary is fixed at eight words. A free-text box cannot be rendered. A constrained
+          one can be read at a glance, across months.</p>
+          <p>Notice what the ramp buys: the difficult stretch in week three is
+          <em>darker</em> as well as cooler, so it reads without relying on hue at all. The single
+          <code>clearing</code> tile is the only off-spectrum colour on the grid, which is why a
+          turning point is visible from across the room.</p>
+          <p class="note">The eight fills are the shipped values from
+          <code>src/constants/words.ts</code>. The pattern of days is authored demonstration
+          data, not a real couple's record.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 02 ARCHITECTURE ===== -->
+  <section class="wrap dsec" id="architecture" aria-labelledby="s02">
+    <div class="dsec__head">
+      <span class="dsec__n">02</span>
+      <h2 class="dsec__title" id="s02">Architecture</h2>
+      <span class="dsec__src">Expo SDK 57 · Firebase · Node 20</span>
+    </div>
+
+    <figure class="fig">
+      <div class="scroll-x">
+      <svg viewBox="0 0 1120 340" role="img" aria-labelledby="archTitle archDesc" style="padding:20px 16px;min-width:820px">
+        <title id="archTitle">The recap generation path</title>
+        <desc id="archDesc">A left-to-right pipeline of six stages. The client fires a callable
+        with a 600 millisecond debounce. The Cloud Function first runs its gates (entitlement,
+        the week-one floor, a transactional lock and a freshness check), all of which sit before
+        any paid call. It then fetches seven Firestore reads in parallel, reduces them to a
+        capped digest, computes every number in a deterministic insights engine, and only then
+        hands the model a bounded plain-text brief to phrase. The result is written to a recaps
+        document, which the client is already subscribed to.</desc>
+
+        <g font-family="Martian Mono, ui-monospace, monospace" fill="#111111">
+
+          <path d="M2 34 L2 22 L757 22 L757 34" fill="none" stroke="#111111" stroke-opacity="0.45" stroke-width="1"/>
+          <text x="380" y="15" font-size="10.5" letter-spacing="1.4" text-anchor="middle" fill="#5c5c5c">EVERYTHING BEFORE THE PAID CALL</text>
+
+          <rect x="2" y="120" width="165" height="104" fill="#ffffff" stroke="#111111" stroke-width="1"/>
+          <text x="14" y="142" font-size="11" font-weight="600" letter-spacing="1.2">CLIENT</text>
+          <line x1="2" y1="152" x2="167" y2="152" stroke="#d4d4d2"/>
+          <text x="14" y="170" font-size="10" fill="#5c5c5c">useRecapTrigger</text>
+          <text x="14" y="187" font-size="10" fill="#5c5c5c">httpsCallable</text>
+          <text x="14" y="209" font-size="10" fill="#2433ff" font-weight="600">600ms debounce</text>
+
+          <rect x="192" y="120" width="165" height="104" fill="#ffffff" stroke="#111111" stroke-width="1"/>
+          <text x="204" y="142" font-size="11" font-weight="600" letter-spacing="1.2">GATES</text>
+          <line x1="192" y1="152" x2="357" y2="152" stroke="#d4d4d2"/>
+          <text x="204" y="170" font-size="10" fill="#5c5c5c">entitlement · solo</text>
+          <text x="204" y="187" font-size="10" fill="#5c5c5c">week-1 floor · lock</text>
+          <text x="204" y="204" font-size="10" fill="#5c5c5c">freshness · freeze</text>
+
+          <rect x="382" y="120" width="165" height="104" fill="#ffffff" stroke="#111111" stroke-width="1"/>
+          <text x="394" y="142" font-size="11" font-weight="600" letter-spacing="1.2">FETCH</text>
+          <line x1="382" y1="152" x2="547" y2="152" stroke="#d4d4d2"/>
+          <text x="394" y="170" font-size="10" fill="#5c5c5c">7 parallel reads</text>
+          <text x="394" y="187" font-size="10" fill="#5c5c5c">range-queried on</text>
+          <text x="394" y="204" font-size="10" fill="#5c5c5c">doc id and date</text>
+
+          <rect x="572" y="120" width="165" height="104" fill="#ffffff" stroke="#111111" stroke-width="1"/>
+          <text x="584" y="142" font-size="11" font-weight="600" letter-spacing="1.2">DIGEST</text>
+          <line x1="572" y1="152" x2="737" y2="152" stroke="#d4d4d2"/>
+          <text x="584" y="170" font-size="10" fill="#5c5c5c">buildDigest()</text>
+          <text x="584" y="187" font-size="10" fill="#5c5c5c">capped, bucketed</text>
+          <text x="584" y="204" font-size="10" fill="#5c5c5c">across the window</text>
+
+          <rect x="762" y="120" width="165" height="104" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+          <text x="774" y="142" font-size="11" font-weight="600" letter-spacing="1.2">INSIGHTS</text>
+          <line x1="762" y1="152" x2="927" y2="152" stroke="#d4d4d2"/>
+          <text x="774" y="170" font-size="10" fill="#5c5c5c">insights.ts · 315 LOC</text>
+          <text x="774" y="187" font-size="10" fill="#5c5c5c">pure arithmetic</text>
+          <text x="774" y="204" font-size="10" font-weight="600">every number</text>
+
+          <rect x="952" y="120" width="165" height="104" fill="#eceeff" stroke="#2433ff" stroke-width="2"/>
+          <text x="964" y="142" font-size="11" font-weight="600" letter-spacing="1.2" fill="#2433ff">MODEL</text>
+          <line x1="952" y1="152" x2="1117" y2="152" stroke="#2433ff" stroke-opacity="0.35"/>
+          <text x="964" y="170" font-size="10" fill="#5c5c5c">brief.ts → recap-flow</text>
+          <text x="964" y="187" font-size="10" fill="#5c5c5c">Gemini via Genkit</text>
+          <text x="964" y="204" font-size="10" font-weight="600" fill="#2433ff">phrasing only</text>
+
+          <g stroke="#111111" stroke-width="1" fill="none">
+            <path d="M167 172 L188 172"/><path d="M183 168 L188 172 L183 176" fill="#111111"/>
+            <path d="M357 172 L378 172"/><path d="M373 168 L378 172 L373 176" fill="#111111"/>
+            <path d="M547 172 L568 172"/><path d="M563 168 L568 172 L563 176" fill="#111111"/>
+            <path d="M737 172 L758 172"/><path d="M753 168 L758 172 L753 176" fill="#111111"/>
+            <path d="M927 172 L948 172"/><path d="M943 168 L948 172 L943 176" fill="#111111"/>
+          </g>
+
+          <path d="M1034 224 L1034 274 L84 274 L84 224" fill="none" stroke="#111111" stroke-opacity="0.45" stroke-width="1" stroke-dasharray="4 4"/>
+          <path d="M80 230 L84 224 L88 230" fill="none" stroke="#111111" stroke-opacity="0.45"/>
+          <text x="559" y="291" font-size="10" text-anchor="middle" fill="#5c5c5c">recaps/{periodId} · the client is already subscribed, so generating → ready arrives with no polling</text>
+
+          <text x="844" y="318" font-size="10" text-anchor="middle" fill="#5c5c5c">the model may not derive a quantity that is not read from here</text>
+          <path d="M844 240 L844 306" stroke="#111111" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="3 3"/>
+        </g>
+      </svg>
+      </div>
+      <figcaption class="fig__cap">
+        The recap path. Seven Cloud Functions exist in total, and only one of them,
+        <code>requestRecap</code>, generates recaps. The two that run on a schedule,
+        <code>sendScheduledBeats</code> and <code>drainPushReceipts</code>, only send and
+        reconcile push notifications, so a recap still exists only because a client asked for
+        one.
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- ===== 03 THE SPLIT ===== -->
+  <section class="wrap dsec" id="split" aria-labelledby="s03">
+    <div class="dsec__head">
+      <span class="dsec__n">03</span>
+      <h2 class="dsec__title" id="s03">Compute, then narrate</h2>
+      <span class="dsec__src">functions/src/insights.ts</span>
+    </div>
+
+    <div class="cols">
+      <div class="prose">
+        <p>The recap is a warm paragraph about a couple's last week, month or year. It is also,
+        structurally, a report full of quantities: an agreement rate, a trend against the prior
+        window, the weekday that ran roughest, how a dip was recovered from. A language model
+        asked to produce that paragraph will happily produce the quantities too, and it will
+        sometimes be wrong.</p>
+        <p>Being wrong about a number in a spreadsheet is a bug. Being wrong about a number
+        describing someone's relationship is something worse. The line written into the source
+        is the design constraint:</p>
+        <p class="quote">A model that computes hallucinates relationship claims.</p>
+        <p>So the system splits in two. <code>insights.ts</code> is 315 lines of pure
+        arithmetic, with <strong>no Firestore, no clock and no model</strong>, and it is the
+        single source of every number. <code>brief.ts</code> turns the digest and those facts
+        into a plain-text brief, and <code>recap-flow.ts</code> hands it to the model with a Zod
+        output schema. The model's only permitted job is to phrase what the brief already
+        says.</p>
+        <p>The discipline shows up in what the engine <em>refuses</em> to say. Every insight
+        carries a <code>hasEnoughData</code> flag, so a thin period stays silent rather than
+        reaching. <code>GapDirectionFacts</code>, which partner held the warmer word on days
+        they diverged, deliberately ships <strong>without a <code>leader</code> field</strong>,
+        so no interface downstream can ever rank one partner above the other.</p>
+      </div>
+
+      <div class="box">
+        <div class="box__head">
+          <h3 class="label">The four insights</h3>
+          <span class="label muted">and what silences each</span>
+        </div>
+        <div class="scroll-x"><table class="dt dt--narrow">
+          <thead><tr><th scope="col">Insight</th><th scope="col">Computes</th><th scope="col">Floor</th></tr></thead>
+          <tbody>
+            <tr>
+              <th scope="row">Convergence</th>
+              <td class="d">agreement rate, trend vs prior window, bucketed series</td>
+              <td>dead band 0.05</td>
+            </tr>
+            <tr>
+              <th scope="row">Gap direction</th>
+              <td class="d">who held the warmer word on divergent days</td>
+              <td>no leader field, by design</td>
+            </tr>
+            <tr>
+              <th scope="row">Recovery</th>
+              <td class="d">dip episodes, and whether recovery came via <code>clearing</code></td>
+              <td>max 3 episodes</td>
+            </tr>
+            <tr class="is-key">
+              <th scope="row">Weekday</th>
+              <td class="d">roughest and warmest weekday</td>
+              <td>min 3 samples per day</td>
+            </tr>
+          </tbody>
+        </table></div>
+        <p class="note note--pad">The weekday floor is the key row because it is the one people
+        assume you skipped: one bad Tuesday is not a pattern, and three samples is the price of
+        saying it is. <code>clearing</code> is excluded from the spectrum array the gap maths
+        runs over, because it is a direction rather than a rung.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 04 INCIDENT ===== -->
+  <section class="wrap dsec" id="incident" aria-labelledby="s04">
+    <div class="dsec__head">
+      <span class="dsec__n">04</span>
+      <h2 class="dsec__title" id="s04">The truncation incident</h2>
+      <span class="dsec__src">functions/src/recap-flow.ts</span>
+    </div>
+
+    <div class="alert">
+      <div class="alert__head">
+        <h3>Incident · a recap of literally <code>...</code> reached a real couple</h3>
+        <span class="status status--live">Root cause found</span>
+      </div>
+      <div class="alert__body">
+        <div class="cols">
+          <div class="prose">
+            <p>The generation call ran with a flat <code>maxOutputTokens</code> ceiling of 1024
+            against a <strong>thinking model</strong>. Measured against the sample digest, the
+            model spent <strong>981 tokens reasoning</strong> and had <strong>28 left to write
+            with</strong>. It stopped on <code>finishReason: 'length'</code>, mid-word.</p>
+            <p>That alone would have been a visible failure. What made it a silent one is that
+            the truncated JSON then <em>repaired</em>, into a one-fragment narrative with the
+            <code>nudges</code> array missing entirely. A repaired truncation is
+            indistinguishable from a real answer, so nothing threw, nothing logged, and the
+            document was written as <code>ready</code>.</p>
+            <p>The fix is three parts, and the third is the one that matters: bounding the
+            thinking budget halved total token use for equal prose quality, raising the ceiling
+            per period gave the writing room, and <strong>throwing on
+            <code>finishReason === 'length'</code></strong> is what makes the failure loud
+            forever. A pipeline that can silently repair its own corrupt output does not have a
+            token budget problem, it has an observability one.</p>
+          </div>
+          <div>
+            <div class="box">
+              <div class="scroll-x"><table class="dt dt--narrow">
+                <thead><tr><th scope="col">Setting</th><th scope="col" class="num">Before</th><th scope="col" class="num">After</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row"><code>thinkingBudget</code></th><td class="num was">unbounded</td><td class="num">256</td></tr>
+                  <tr class="is-key"><th scope="row">maxOutputTokens · week</th><td class="num was">1024</td><td class="num">2048</td></tr>
+                  <tr><th scope="row">maxOutputTokens · month</th><td class="num was">1024</td><td class="num">4096</td></tr>
+                  <tr><th scope="row">maxOutputTokens · year</th><td class="num was">1024</td><td class="num">8192</td></tr>
+                  <tr><th scope="row">finishReason <code>'length'</code></th><td class="num was">repaired</td><td class="num">throws</td></tr>
+                </tbody>
+              </table></div>
+            </div>
+            <p class="note mt-3">Failure handling downstream follows the same rule. A failed
+            generation never leaves the document in <code>generating</code>, and it restores the
+            prior document only if that one was <code>ready</code>; otherwise it deletes.
+            Restoring a stale <code>not_enough_data</code> would dress an outage up as "you
+            haven't logged enough", which is the one thing that status must never imply.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 05 DIGEST ===== -->
+  <section class="wrap dsec" id="digest" aria-labelledby="s05">
+    <div class="dsec__head">
+      <span class="dsec__n">05</span>
+      <h2 class="dsec__title" id="s05">The digest is ETL</h2>
+      <span class="dsec__src">functions/src/digest.ts · 644 LOC</span>
+    </div>
+
+    <div class="cols">
+      <div class="prose">
+        <p>Strip the subject matter away and the recap path is an extract-transform-load job
+        with a hard payload budget at the end of it. Extract: seven Firestore reads issued in
+        parallel: the couple document, logs range-queried on <code>FieldPath.documentId()</code>,
+        gratitudes, moments and flags range-queried on date, plus the events and profiles
+        collections. The prior equal-length window is fetched separately to give the
+        convergence trend a baseline.</p>
+        <p>Transform: a pure reduction into a compact object with explicit caps. The sampling
+        rules are where the domain leaks into the pipeline in a good way. The window is
+        <strong>cut into even buckets</strong> rather than read from the front, so a recap is
+        not just a summary of the first three days, and each bucket's pick is scored for
+        substance and notable days, with <strong>both partners guaranteed a voice</strong>.
+        Flag snippets <strong>prefer resolved ones</strong>, because the recap's register is
+        "came back from it", not re-litigating the argument.</p>
+        <p>My favourite function in the file exists purely to <em>refuse</em> to pass data
+        along. <code>streakAsOf()</code> will not hand the model
+        <code>couple.currentStreak</code>, because that counter does not decay. When the streak
+        cannot be known it returns <code>undefined</code> and the streak is left out of the
+        brief entirely, rather than <code>0</code>. Telling a couple their streak is nothing
+        when it was twelve is its own kind of wrong answer.</p>
+      </div>
+
+      <div class="box">
+        <div class="box__head">
+          <h3 class="label">Payload budget</h3>
+          <span class="label muted">week / month / year</span>
+        </div>
+        <div class="scroll-x"><table class="dt dt--narrow">
+          <tbody>
+            <tr><th scope="row">Gratitude snippets</th><td class="num">6 / 10 / 2&nbsp;a&nbsp;month</td></tr>
+            <tr><th scope="row">Moment snippets</th><td class="num">4 / 6 / 1&nbsp;a&nbsp;month</td></tr>
+            <tr><th scope="row">Flag snippets</th><td class="num">3</td></tr>
+            <tr class="is-key"><th scope="row">Day sequence</th><td class="num">40 days</td></tr>
+            <tr><th scope="row">Parallel reads</th><td class="num">7</td></tr>
+            <tr><th scope="row">Recovery episodes</th><td class="num">3</td></tr>
+          </tbody>
+        </table></div>
+        <p class="note note--pad">The forty-day cap is the key row because it is what makes a
+        yearly recap possible at all: past it, the day-by-day sequence is dropped and the model
+        works from the bucketed series instead.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 06 COST ===== -->
+  <section class="wrap dsec" id="cost" aria-labelledby="s06">
+    <div class="dsec__head">
+      <span class="dsec__n">06</span>
+      <h2 class="dsec__title" id="s06">Cost engineering</h2>
+      <span class="dsec__src">every gate sits in front of the paid call</span>
+    </div>
+
+    <div class="prose prose--lead">
+      <p>An LLM feature is the first thing most teams ship that costs real money per
+      interaction, and the recap archive is scrollable: chevrons can walk a year of periods in
+      a few seconds. Each of these gates exists because of a specific way that bill could have
+      run away, and every one of them evaluates <em>before</em> the model is reached. One
+      deliberate exception came later: a narrative that echoes a flag back gets a single retry,
+      so one generation can cost two calls.</p>
+    </div>
+
+    <div class="box">
+      <div class="scroll-x">
+      <table class="dt">
+        <caption class="vh">The gates in front of every model call</caption>
+        <thead>
+          <tr><th scope="col" class="i">Gate</th><th scope="col">Rule</th><th scope="col">What it prevents</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="i">01</td><th scope="row">Client debounce</th>
+            <td class="d">600&nbsp;ms settle before the callable fires, so the periods you scrolled past are never billed</td></tr>
+          <tr><td class="i">02</td><th scope="row">Entitlement</th>
+            <td class="d">Checked server-side, defaulting closed. The source note: <em>if the two ever drift, drift in this direction</em></td></tr>
+          <tr><td class="i">03</td><th scope="row">Week-one floor</th>
+            <td class="d">Seven tended days, counted inclusively. It shipped counting elapsed days, contradicted the app's own streak counter, and now has a test pinning it</td></tr>
+          <tr><td class="i">04</td><th scope="row">Data floor</th>
+            <td class="d">3 days for a week, 6 for a month, 20 for a year. Below that the recap declines rather than reaches</td></tr>
+          <tr class="is-key"><td class="i">05</td><th scope="row">Transactional lock</th>
+            <td class="d">A Firestore transaction with a two-minute TTL returning serve, in&nbsp;progress, or generate, so two devices asking at once pay once</td></tr>
+          <tr><td class="i">06</td><th scope="row">Daily regeneration cap</th>
+            <td class="d">At most once per calendar day, in the couple's own timezone</td></tr>
+          <tr><td class="i">07</td><th scope="row">Period freeze</th>
+            <td class="d">A finalised period regenerates exactly once, when its end date finally matches the real period end, then never again</td></tr>
+          <tr><td class="i">08</td><th scope="row">Window validation</th>
+            <td class="d">Future and pre-pairing windows are rejected, so a hand-rolled call cannot walk backwards through invented history billing a call per step</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 07 AUTHZ ===== -->
+  <section class="wrap dsec" id="authz" aria-labelledby="s07">
+    <div class="dsec__head">
+      <span class="dsec__n">07</span>
+      <h2 class="dsec__title" id="s07">Authorisation as schema</h2>
+      <span class="dsec__src">firestore.rules · 257 LOC</span>
+    </div>
+
+    <div class="cols">
+      <div class="prose">
+        <p>Firestore has no schema. <code>src/types/models.ts</code> is the schema, and
+        <code>firestore.rules</code> is the enforcement, because Cloud Functions run on the Admin SDK
+        and bypass rules entirely, so the rules file <em>is</em> the authorisation layer for
+        every client write in the product.</p>
+        <p>Writing it as a data-modelling exercise rather than a checklist is what makes it
+        short. The strongest rules are the ones expressed as constraints on a
+        <strong>diff</strong> rather than on an identity: a member may write to the day's log
+        only if the set of changed keys in the entries map is exactly their own uid. The same
+        shape is reused for resolving a flag.</p>
+        <p>The pairing claim is expressed the same way, and never became a Cloud Function. A
+        second partner may join a couple only if the members array currently has one entry, the
+        proposed array is exactly the existing member plus the caller, and three
+        <code>get()</code>s against the invite prove it is pending, matches the couple, and has
+        not expired.</p>
+        <p>The threat model is written into the file, <em>your own partner, not a stranger</em>,
+        along with the loosening that model licenses. That is the part most rules files leave
+        implicit, and it is the part a reviewer actually needs.</p>
+      </div>
+
+      <div class="box">
+        <div class="box__head">
+          <h3 class="label">Three rules worth reading</h3>
+        </div>
+        <div class="scroll-x"><table class="dt dt--narrow">
+          <tbody>
+            <tr>
+              <th scope="row" style="width:34%">Self-key diff</th>
+              <td class="d"><code>entries.diff().affectedKeys().hasOnly([uid])</code>: you may mutate your own key in the map and no other</td>
+            </tr>
+            <tr class="is-key">
+              <th scope="row"><code>get</code>, not <code>read</code></th>
+              <td class="d">Invites allow <code>get</code> deliberately. <code>read</code> implies <code>list</code>, which would let any anonymous user enumerate every invite code, creator and couple id, and hijack pairing slots</td>
+            </tr>
+            <tr>
+              <th scope="row">No self-granting</th>
+              <td class="d">Users and couples may be updated only if the changed keys exclude <code>plus</code>. The subscription field is written by the server alone</td>
+            </tr>
+          </tbody>
+        </table></div>
+        <p class="note note--pad">Thirteen collections: <code>users</code>,
+        <code>couples</code>, <code>invites</code>, a server-only <code>pushReceipts</code>,
+        and nine subcollections under a couple. Recaps are <code>allow write: if false</code>;
+        they only ever arrive from the server.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 08 MONEY ===== -->
+  <section class="wrap dsec" id="money" aria-labelledby="s08">
+    <div class="dsec__head">
+      <span class="dsec__n">08</span>
+      <h2 class="dsec__title" id="s08">Correctness under money</h2>
+      <span class="dsec__src">revenueCatWebhook · entitlements.ts</span>
+    </div>
+
+    <div class="cols">
+      <div class="prose">
+        <p>A subscription for a couple is not a subscription for a user, and almost every bug
+        in this area comes from that gap. One partner pays; both must be entitled; either may
+        lapse; and the person who did not pay must never lose access because the person who
+        did let their card expire.</p>
+        <p>The webhook is deliberately conservative about what revokes.
+        <code>EXPIRATION</code> does. <code>CANCELLATION</code> only means auto-renew is off,
+        and <code>BILLING_ISSUE</code> opens a grace period; revoking on either would lock out a
+        paying customer. Events carry a timestamp and are checked for ordering, because a
+        renewal overtaking the cancellation before it shows up as a customer randomly losing
+        access.</p>
+        <p>The entitlement is written in two places: the user document, and mirrored onto the
+        couple. That mirror is what makes "one plan covers both of you" literally true rather
+        than aspirational. Revoking clears the couple mirror only if the lapsing user is the
+        recorded purchaser. Otherwise an expiring ex-subscriber would knock out their
+        partner's own live subscription.</p>
+        <p>Another function exists solely because of onboarding order. Someone subscribes
+        while still solo; their partner joins days later; the couple document has no
+        entitlement and no webhook is due until renewal.
+        <code>mirrorPlusOnPairing</code> fires on the couple document updating and closes that
+        window. That is the main path, not an edge case.</p>
+      </div>
+
+      <div class="box">
+        <div class="box__head">
+          <h3 class="label">Client priority chain</h3>
+          <span class="label muted">entitlements.ts</span>
+        </div>
+        <div class="scroll-x"><table class="dt dt--narrow">
+          <tbody>
+            <tr><td class="i">1</td><th scope="row">Live couple record</th></tr>
+            <tr><td class="i">2</td><th scope="row">Live own record</th></tr>
+            <tr class="is-key"><td class="i">3</td><th scope="row">Live SDK snapshot</th></tr>
+            <tr><td class="i">4</td><th scope="row">Lapsed server record</th></tr>
+            <tr><td class="i">5</td><th scope="row">Dev override</th></tr>
+            <tr><td class="i">6</td><th scope="row">Default: not entitled</th></tr>
+          </tbody>
+        </table></div>
+        <p class="note note--pad">Tier 3 sitting above tier 4 is a shipped bug fix. In the old
+        order: trial ends, the webhook writes inactive, the user resubscribes, and the stale
+        record still answered, dropping someone who had <em>just paid</em> back into a locked
+        app. A snapshot may only ever grant, never revoke, because only the server sees
+        refunds. The expiry grace is 24 hours, chosen asymmetrically: over-serving a lapsed
+        subscriber for a day costs nothing, and locking out a paying one over a drifted device
+        clock is the worst bug this file could have.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 09 GATES ===== -->
+  <section class="wrap dsec" id="gates" aria-labelledby="s09">
+    <div class="dsec__head">
+      <span class="dsec__n">09</span>
+      <h2 class="dsec__title" id="s09">Gates that actually run</h2>
+      <span class="dsec__src">scripts/ · 1,200 LOC</span>
+    </div>
+
+    <div class="prose prose--lead">
+      <p>A design system that is not enforced is a document, and a document loses. The app
+      accumulated <strong>573 <code>Colors.light.*</code> references</strong> before anything
+      was watching, which is what a rule with no runner costs. So the checks became executable,
+      each with a <code>--check</code> mode that fails a build.</p>
+    </div>
+
+    <div class="cards mod">
+      <div>
+        <h3>theme-lint</h3>
+        <p>Bans colour literals in screens and components, and bans naming a theme by name. 155&nbsp;LOC.</p>
+      </div>
+      <div>
+        <h3>theme-contrast</h3>
+        <p>Computes WCAG ratios across both themes and asserts six guardrails, including a <em>ceiling</em>, because a word at 14.6:1 on a dark page is legible and awful. 256&nbsp;LOC.</p>
+      </div>
+      <div>
+        <h3>hearth-loop</h3>
+        <p>Rewrites the animator's Lottie delivery into a seamless loop, selecting targets by behaviour rather than layer name, idempotently. 462&nbsp;LOC.</p>
+      </div>
+      <div>
+        <h3>Typed analytics</h3>
+        <p>Events are a discriminated union, so a mistyped event name fails <code>tsc</code>. That is the only automated check the app side has, so it has to catch instrumentation drift.</p>
+      </div>
+    </div>
+
+    <p class="note mt-5">A hundred and four backend tests run under <code>tsx --test</code>
+    across nine modules, from the digest and the insights engine to the brief, the output
+    validator and the scheduled pushes. The app side has no unit tests: it is checked by
+    <code>tsc --noEmit</code> and lint, and Sentry carries the rest: masked replays,
+    <code>sendDefaultPii: false</code>, and a 0.2 production trace sample. That is an honest
+    description of the coverage, not a target I am claiming to have hit.</p>
+  </section>
+
+  <!-- ===== 10 SCOPE ===== -->
+  <section class="wrap dsec" id="scope" aria-labelledby="s10">
+    <div class="dsec__head">
+      <span class="dsec__n">10</span>
+      <h2 class="dsec__title" id="s10">Scope &amp; method</h2>
+      <span class="dsec__src">2026-07-07 → 2026-09-25</span>
+    </div>
+
+    <div class="cols cols--even">
+      <div class="box">
+        <div class="box__head">
+          <h3 class="label">Measured</h3>
+          <span class="label muted">main at 2026-09-25</span>
+        </div>
+        <div class="scroll-x"><table class="dt dt--narrow">
+          <tbody>
+            <tr><th scope="row">Commits</th><td class="num">433</td><td class="d">11 weeks</td></tr>
+            <tr><th scope="row">Pull requests</th><td class="num">134</td><td class="d">merged</td></tr>
+            <tr><th scope="row">App source</th><td class="num">37,401</td><td class="d">LOC · 190 files</td></tr>
+            <tr><th scope="row">Functions</th><td class="num">7,797</td><td class="d">LOC · Node 20, incl. tests</td></tr>
+            <tr><th scope="row">Rules</th><td class="num">257</td><td class="d">LOC</td></tr>
+            <tr><th scope="row">Build scripts</th><td class="num">1,200</td><td class="d">LOC</td></tr>
+            <tr><th scope="row">Routes</th><td class="num">36</td><td class="d">expo-router</td></tr>
+            <tr><th scope="row">Collections</th><td class="num">13</td><td class="d">Firestore</td></tr>
+            <tr class="is-key"><th scope="row">Tests</th><td class="num">104</td><td class="d">backend only</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="prose">
+        <p><strong>Stack.</strong> Expo SDK 57, React Native 0.86, React 19.2, TypeScript, with
+        the React Compiler on. Firebase for auth, Firestore and Functions. Genkit with Gemini
+        for narration. RevenueCat for subscriptions, Sentry for errors, GA4 and PostHog for the
+        funnel, Expo for push. EAS for builds and OTA updates on a fingerprint runtime
+        policy.</p>
+        <p><strong>Identity is anonymous-first.</strong> Every user is a Firebase anonymous
+        account from first open; onboarding runs on it, and linking Apple, Google or email later
+        upgrades the same uid in place, so nothing is lost by trying it first. The account ask
+        is deliberately placed after the first reveal, the emotional peak, and the ritual is
+        never gated on it.</p>
+        <p><strong>Method.</strong> This was built with AI-assisted development, on a
+        feature-branch-per-change workflow with 134 merged pull requests behind those 433
+        commits. I mention it because it is true and because the guardrails in this write-up
+        (the executable contrast checks, the typed analytics union, the deterministic engine the
+        model is not allowed past) are the part of that workflow I would actually defend.</p>
+        <p><strong>Status.</strong> Approved and released on the App Store on 13 September
+        2026 as version 1.0, and at version 1.2.0 now. I don't quote download, rating or
+        retention figures here.</p>
+      </div>
+    </div>
+
+    <div class="actions mt-6">
+      <a class="btn btn--primary" href="/#contact">Ask me about any of it</a>
+      <a class="btn" href="https://apps.apple.com/us/app/tend-a-daily-couples-ritual/id6794927461" rel="noopener">View on the App Store</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap foot">
+  <div class="foot__row">
+    <span>© <span id="yr">2026</span> Malek Aldoss</span>
+    <a href="/">Home</a>
+    <a class="foot__push" href="/legal/privacy.html">Privacy</a>
+    <a href="/legal/terms.html">Terms</a>
+  </div>
+</footer>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

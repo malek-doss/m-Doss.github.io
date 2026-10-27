@@ -1,0 +1,7 @@
+# Local tooling, never published
+.claude/
+.impeccable/
+
+# Private working brief: claim boundaries and personal notes. GitHub Pages would
+# serve it at malekdoss.com/PRODUCT.md, so it stays on this machine.
+PRODUCT.md
